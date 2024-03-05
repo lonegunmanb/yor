@@ -3,6 +3,7 @@ package structure
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/minamijoyo/tfschema/tfschema"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -15,12 +16,11 @@ import (
 	"github.com/bridgecrewio/yor/src/common/structure"
 	"github.com/bridgecrewio/yor/src/common/tagging/tags"
 	"github.com/bridgecrewio/yor/src/common/utils"
-	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
+	tfjson "github.com/hashicorp/terraform-json"
 	"github.com/hashicorp/terraform/command"
-	"github.com/minamijoyo/tfschema/tfschema"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -676,28 +676,19 @@ func (p *TerraformParser) isBlockTaggable(hclBlock *hclwrite.Block) (bool, error
 	if err != nil {
 		return false, err
 	}
-
-	providerName := getProviderFromResourceType(resourceType)
-
-	client := p.getClient(providerName)
 	taggable := false
-	if client != nil {
-		var typeSchema *tfschema.Block
-		logger.MuteOutputBlock(func() {
-			typeSchema, err = client.GetResourceTypeSchema(resourceType)
-		})
-		if err != nil {
-			if strings.Contains(err.Error(), "Failed to find resource type") {
-				// Resource Type doesn't have schema yet in the provider
-				return false, nil
-			}
-			return false, err
-		}
-
-		if _, ok := typeSchema.Attributes[tagAtt]; ok {
-			taggable = true
-		}
+	var typeSchema *tfjson.Schema
+	logger.MuteOutputBlock(func() {
+		typeSchema, ok = resources[resourceType]
+	})
+	if !ok {
+		return false, nil
 	}
+
+	if _, ok := typeSchema.Block.Attributes[tagAtt]; ok {
+		taggable = true
+	}
+
 	taggableResourcesLock.Lock()
 	p.taggableResourcesCache[resourceType] = taggable
 	taggableResourcesLock.Unlock()
@@ -808,48 +799,6 @@ func (p *TerraformParser) parseTagAttribute(tokens hclwrite.Tokens) map[string]s
 	}
 
 	return parsedTags
-}
-
-func (p *TerraformParser) getClient(providerName string) tfschema.Client {
-	if utils.InSlice(SkippedProviders, providerName) {
-		return nil
-	}
-
-	p.tfClientLock.Lock()
-	defer p.tfClientLock.Unlock()
-
-	client, exists := p.providerToClientMap.Load(providerName)
-	if exists {
-		return client.(tfschema.Client)
-	}
-
-	hclLogger := hclog.New(&hclog.LoggerOptions{
-		Name:   "plugin",
-		Level:  hclog.Error,
-		Output: hclog.DefaultOutput,
-	})
-	var err error
-	var newClient tfschema.Client
-	if p.terraformModule == nil {
-		logger.Warning(fmt.Sprintf("Failed to initialize terraform module, it might be due to a malformed file in the given root dir: [%s]", p.rootDir))
-		return nil
-	}
-	logger.MuteOutputBlock(func() {
-		newClient, err = tfschema.NewClient(providerName, tfschema.Option{
-			RootDir: p.terraformModule.ProvidersInstallDir,
-			Logger:  hclLogger,
-		})
-	})
-	if err != nil {
-		if strings.Contains(err.Error(), "Failed to find plugin") {
-			logger.Warning(fmt.Sprintf("Could not load provider %v, resources from this provider will not be tagged", providerName))
-			logger.Warning(fmt.Sprintf("Try to run `terraform init` in the given root dir: [%s] and try again.", p.rootDir))
-		}
-		return nil
-	}
-
-	p.providerToClientMap.Store(providerName, newClient)
-	return newClient
 }
 
 func (p *TerraformParser) getModuleTags(hclBlock *hclwrite.Block, tagsAttributeName string) ([]tags.ITag, bool) {
