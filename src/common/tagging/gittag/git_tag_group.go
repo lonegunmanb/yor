@@ -195,8 +195,14 @@ func (t *TagGroup) updateBlameForOriginLines(block structure.IBlock, blame *gits
 func (t *TagGroup) hasNonTagChanges(blame *gitservice.GitBlame, block structure.IBlock) bool {
 	tagsLines := block.GetTagsLines()
 	hasTags := tagsLines.Start != -1 && tagsLines.End != -1
+	var latestNonBotCommit = blame.GetLatestCommit()
+	if latestNonBotCommit == nil {
+		return false
+	}
 	for lineNum, line := range blame.BlamesByLine {
-		if line.Hash.String() == blame.GetLatestCommit().Hash.String() &&
+		lineHash := line.Hash.String()
+		latestCommitHash := latestNonBotCommit.Hash.String()
+		if lineHash == latestCommitHash &&
 			(!hasTags || lineNum < tagsLines.Start || lineNum > tagsLines.End) {
 			return true
 		}

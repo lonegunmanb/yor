@@ -3,7 +3,6 @@ package structure
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/minamijoyo/tfschema/tfschema"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -20,7 +19,6 @@ import (
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	tfjson "github.com/hashicorp/terraform-json"
-	"github.com/hashicorp/terraform/command"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -44,10 +42,10 @@ type TerraformParser struct {
 	tagModules             bool
 	tagLocalModules        bool
 	terraformModule        *TerraformModule
-	moduleImporter         *command.GetCommand
-	moduleInstallDir       string
-	downloadedPaths        []string
-	tfClientLock           sync.Mutex
+	//moduleImporter         *command.GetCommand
+	moduleInstallDir string
+	downloadedPaths  []string
+	tfClientLock     sync.Mutex
 }
 
 func (p *TerraformParser) Name() string {
@@ -68,19 +66,12 @@ func (p *TerraformParser) Init(rootDir string, args map[string]string) {
 		p.tagLocalModules, _ = strconv.ParseBool(argTagLocalModule)
 	}
 
-	p.moduleImporter = &command.GetCommand{Meta: command.Meta{Color: false, Ui: customTfLogger{}}}
+	//p.moduleImporter = &command.GetCommand{Meta: command.Meta{Color: false, Ui: customTfLogger{}}}
 	pwd, _ := os.Getwd()
 	p.moduleInstallDir = filepath.Join(pwd, ".terraform", "modules")
 }
 
 func (p *TerraformParser) Close() {
-	logger.MuteOutputBlock(func() {
-		p.providerToClientMap.Range(func(provider, iClient interface{}) bool {
-			client := iClient.(tfschema.Client)
-			client.Close()
-			return true
-		})
-	})
 }
 
 func (p *TerraformParser) GetSkippedDirs() []string {
@@ -585,11 +576,11 @@ func (p *TerraformParser) isModuleTaggable(fp string, moduleName string, moduleD
 	absRootPath, _ := filepath.Abs(p.rootDir)
 	actualPath, _ = filepath.Abs(filepath.Join(absRootPath, actualPath))
 	if !utils.InSlice(p.downloadedPaths, fp) && os.Getenv("YOR_DISABLE_TF_MODULE_DOWNLOAD") != "TRUE" {
-		logger.MuteOutputBlock(func() {
-			logger.Info(fmt.Sprintf("Downloading modules for dir %v\n", actualPath))
-			_ = p.moduleImporter.Run([]string{actualPath})
-			p.downloadedPaths = append(p.downloadedPaths, fp)
-		})
+		//logger.MuteOutputBlock(func() {
+		//	logger.Info(fmt.Sprintf("Downloading modules for dir %v\n", actualPath))
+		//	_ = p.moduleImporter.Run([]string{actualPath})
+		//	p.downloadedPaths = append(p.downloadedPaths, fp)
+		//})
 	}
 	expectedModuleDir := filepath.Join(p.moduleInstallDir, moduleName, moduleDir)
 	if _, err := os.Stat(expectedModuleDir); os.IsNotExist(err) {
