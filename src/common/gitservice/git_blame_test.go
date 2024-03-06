@@ -1,6 +1,7 @@
 package gitservice
 
 import (
+	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/stretchr/testify/assert"
@@ -29,7 +30,7 @@ func TestParseBlameResult(t *testing.T) {
 		},
 		{
 			desc: "single line",
-			input: `cc26c4d06f8e57f8da2a8b7d008142b5026556cb 1 1 1
+			input: fmt.Sprintf(`cc26c4d06f8e57f8da2a8b7d008142b5026556cb 1 1 1
 author hezijie
 author-mail <lonegunmanb@hotmail.com>
 author-time 1709707964
@@ -41,7 +42,7 @@ committer-tz +0800
 summary multiple lines test
 previous fb8e4e2e0b8a874c18ad32a319a8d79c37519d2a main.tf
 filename main.tf
-        data "azurerm_resource_group" "main"  {`,
+%sdata "azurerm_resource_group" "main"  {`, "\t"),
 			expected: []*git.Line{
 				{
 					Author: "hezijie",
@@ -54,7 +55,7 @@ filename main.tf
 		},
 		{
 			desc: "newline tail",
-			input: `cc26c4d06f8e57f8da2a8b7d008142b5026556cb 1 1 1
+			input: fmt.Sprintf(`cc26c4d06f8e57f8da2a8b7d008142b5026556cb 1 1 1
 author hezijie
 author-mail <lonegunmanb@hotmail.com>
 author-time 1709707964
@@ -66,8 +67,8 @@ committer-tz +0800
 summary multiple lines test
 previous fb8e4e2e0b8a874c18ad32a319a8d79c37519d2a main.tf
 filename main.tf
-        data "azurerm_resource_group" "main"  {
-`,
+%sdata "azurerm_resource_group" "main"  {
+`, "\t"),
 			expected: []*git.Line{
 				{
 					Author: "hezijie",
@@ -80,7 +81,7 @@ filename main.tf
 		},
 		{
 			desc: "multiple line",
-			input: `cc26c4d06f8e57f8da2a8b7d008142b5026556cb 1 1 1
+			input: fmt.Sprintf(`cc26c4d06f8e57f8da2a8b7d008142b5026556cb 1 1 1
 author hezijie
 author-mail <lonegunmanb@hotmail.com>
 author-time 1709707964
@@ -92,7 +93,7 @@ committer-tz +0800
 summary multiple lines test
 previous fb8e4e2e0b8a874c18ad32a319a8d79c37519d2a main.tf
 filename main.tf
-        data "azurerm_resource_group" "main"  {
+%sdata "azurerm_resource_group" "main"  {
 e6b0bff7323580793611d8f68db93deddd6f2a46 2 2 1
 author Yuping Wei
 author-mail <56525716+yupwei68@users.noreply.github.com>
@@ -105,7 +106,7 @@ committer-tz +0800
 summary terraform version upgrade and code reorg (#39)
 previous d365197adaefbd87f269772556793f2e46f00c41 main.tf
 filename main.tf
-          name = var.resource_group_name`,
+%sname = var.resource_group_name`, "\t", "\t"),
 			expected: []*git.Line{
 				{
 					Author: "hezijie",

@@ -57,6 +57,7 @@ func (g *GitService) Blame(c *object.Commit, path string) (*git.BlameResult, err
 	return blameResult, nil
 }
 
+// https://github.com/thani-sh/blamejs/blob/master/index.js
 func (g *GitService) ParseBlameResult(blameStr string) ([]*git.Line, error) {
 	lines := linkedlistqueue.New()
 	for _, line := range strings.Split(blameStr, "\n") {
