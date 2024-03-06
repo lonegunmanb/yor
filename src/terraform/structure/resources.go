@@ -4,7 +4,7 @@ import (
 	tfjson "github.com/hashicorp/terraform-json"
 	alicloud "github.com/lonegunmanb/terraform-alicloud-schema/generated"
 	aws "github.com/lonegunmanb/terraform-aws-schema/v5/generated"
-	azurerm "github.com/lonegunmanb/terraform-aws-schema/v5/generated"
+	azurerm "github.com/lonegunmanb/terraform-azurerm-schema/v3/generated"
 	google "github.com/lonegunmanb/terraform-google-schema/v4/generated"
 )
 

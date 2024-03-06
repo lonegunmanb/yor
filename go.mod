@@ -12,6 +12,7 @@ require (
 	github.com/hashicorp/terraform-json v0.21.0
 	github.com/lonegunmanb/terraform-alicloud-schema v1.218.0
 	github.com/lonegunmanb/terraform-aws-schema/v5 v5.39.1
+	github.com/lonegunmanb/terraform-azurerm-schema/v3 v3.94.0
 	github.com/lonegunmanb/terraform-google-schema/v4 v4.84.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pmezard/go-difflib v1.0.0
@@ -63,4 +64,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/awslabs/goformation/v5 => github.com/bridgecrewio/goformation/v5 v5.0.0-20210823081757-99ed9bf3c0e5
+replace (
+	github.com/awslabs/goformation/v5 => github.com/bridgecrewio/goformation/v5 v5.0.0-20210823081757-99ed9bf3c0e5
+	github.com/go-git/go-git/v5 => github.com/lonegunmanb/go-git/v5 v5.11.2
+)

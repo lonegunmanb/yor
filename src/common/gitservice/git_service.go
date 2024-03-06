@@ -145,7 +145,7 @@ func (g *GitService) GetFileBlame(filePath string) (*git.BlameResult, error) {
 		return blame.(*git.BlameResult), nil
 	}
 
-	relativeFilePath := g.ComputeRelativeFilePath(filePath)
+	//relativeFilePath := g.ComputeRelativeFilePath(filePath)
 	var selectedCommit *object.Commit
 
 	gitGraphLock.Lock() // Git is a graph, different files can lead to graph scans interfering with each other
@@ -164,11 +164,11 @@ func (g *GitService) GetFileBlame(filePath string) (*git.BlameResult, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get previous commit: %s", err)
 	}
-	blame, err = git.Blame(selectedCommit, relativeFilePath)
+	blame, err = g.Blame(selectedCommit, filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get blame for latest commit of file %s because of error %s", filePath, err)
 	}
-	previousBlame, err := git.Blame(previousCommit, relativeFilePath)
+	previousBlame, err := g.Blame(previousCommit, filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get blame for latest commit of file %s because of error %s", filePath, err)
 	}
