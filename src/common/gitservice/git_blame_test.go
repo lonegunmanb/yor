@@ -45,8 +45,8 @@ filename main.tf
 %sdata "azurerm_resource_group" "main"  {`, "\t"),
 			expected: []*git.Line{
 				{
-					Author: "hezijie",
-					Text:   `        data "azurerm_resource_group" "main"  {`,
+					Author: "lonegunmanb@hotmail.com",
+					Text:   `data "azurerm_resource_group" "main"  {`,
 					//"Mon, 02 Jan 2006 15:04:05 -0700"
 					Date: timeParse(time.RFC1123Z, "Wed, 06 Mar 2024 14:52:44 +0800").UTC(),
 					Hash: plumbing.NewHash("cc26c4d06f8e57f8da2a8b7d008142b5026556cb"),
@@ -71,8 +71,8 @@ filename main.tf
 `, "\t"),
 			expected: []*git.Line{
 				{
-					Author: "hezijie",
-					Text:   `        data "azurerm_resource_group" "main"  {`,
+					Author: "lonegunmanb@hotmail.com",
+					Text:   `data "azurerm_resource_group" "main"  {`,
 					//"Mon, 02 Jan 2006 15:04:05 -0700"
 					Date: timeParse(time.RFC1123Z, "Wed, 06 Mar 2024 14:52:44 +0800").UTC(),
 					Hash: plumbing.NewHash("cc26c4d06f8e57f8da2a8b7d008142b5026556cb"),
@@ -109,16 +109,149 @@ filename main.tf
 %sname = var.resource_group_name`, "\t", "\t"),
 			expected: []*git.Line{
 				{
-					Author: "hezijie",
-					Text:   `        data "azurerm_resource_group" "main"  {`,
+					Author: "lonegunmanb@hotmail.com",
+					Text:   `data "azurerm_resource_group" "main"  {`,
 					Date:   timeParse(time.RFC1123Z, "Wed, 06 Mar 2024 14:52:44 +0800").UTC(),
 					Hash:   plumbing.NewHash("cc26c4d06f8e57f8da2a8b7d008142b5026556cb"),
 				},
 				{
-					Author: "Yuping Wei",
-					Text:   `          name = var.resource_group_name`,
+					Author: "56525716+yupwei68@users.noreply.github.com",
+					Text:   `name = var.resource_group_name`,
 					Date:   timeParse(time.RFC1123Z, "Fri, 07 Feb 2020 18:42:06 +0800").UTC(),
 					Hash:   plumbing.NewHash("e6b0bff7323580793611d8f68db93deddd6f2a46"),
+				},
+			},
+		},
+		{
+			desc: "multiple line with empty line",
+			input: fmt.Sprintf(`cc26c4d06f8e57f8da2a8b7d008142b5026556cb 1 1 1
+author hezijie
+author-mail <lonegunmanb@hotmail.com>
+author-time 1709707964
+author-tz +0800
+committer hezijie
+committer-mail <lonegunmanb@hotmail.com>
+committer-time 1709707964
+committer-tz +0800
+summary multiple lines test
+previous fb8e4e2e0b8a874c18ad32a319a8d79c37519d2a main.tf
+filename main.tf
+%s
+e6b0bff7323580793611d8f68db93deddd6f2a46 2 2 1
+author Yuping Wei
+author-mail <56525716+yupwei68@users.noreply.github.com>
+author-time 1581072126
+author-tz +0800
+committer GitHub
+committer-mail <noreply@github.com>
+committer-time 1581072126
+committer-tz +0800
+summary terraform version upgrade and code reorg (#39)
+previous d365197adaefbd87f269772556793f2e46f00c41 main.tf
+filename main.tf
+%sline`, "\t", "\t"),
+			expected: []*git.Line{
+				{
+					Author: "lonegunmanb@hotmail.com",
+					Text:   ``,
+					Date:   timeParse(time.RFC1123Z, "Wed, 06 Mar 2024 14:52:44 +0800").UTC(),
+					Hash:   plumbing.NewHash("cc26c4d06f8e57f8da2a8b7d008142b5026556cb"),
+				},
+				{
+					Author: "56525716+yupwei68@users.noreply.github.com",
+					Text:   `line`,
+					Date:   timeParse(time.RFC1123Z, "Fri, 07 Feb 2020 18:42:06 +0800").UTC(),
+					Hash:   plumbing.NewHash("e6b0bff7323580793611d8f68db93deddd6f2a46"),
+				},
+			},
+		},
+		{
+			desc: "multiple line without previous",
+			input: fmt.Sprintf(`cc26c4d06f8e57f8da2a8b7d008142b5026556cb 1 1 1
+author hezijie
+author-mail <lonegunmanb@hotmail.com>
+author-time 1709707964
+author-tz +0800
+committer hezijie
+committer-mail <lonegunmanb@hotmail.com>
+committer-time 1709707964
+committer-tz +0800
+summary multiple lines test
+filename main.tf
+%sdata "azurerm_resource_group" "main"  {
+e6b0bff7323580793611d8f68db93deddd6f2a46 2 2 1
+author Yuping Wei
+author-mail <56525716+yupwei68@users.noreply.github.com>
+author-time 1581072126
+author-tz +0800
+committer GitHub
+committer-mail <noreply@github.com>
+committer-time 1581072126
+committer-tz +0800
+summary terraform version upgrade and code reorg (#39)
+filename main.tf
+%sname = var.resource_group_name`, "\t", "\t"),
+			expected: []*git.Line{
+				{
+					Author: "lonegunmanb@hotmail.com",
+					Text:   `data "azurerm_resource_group" "main"  {`,
+					Date:   timeParse(time.RFC1123Z, "Wed, 06 Mar 2024 14:52:44 +0800").UTC(),
+					Hash:   plumbing.NewHash("cc26c4d06f8e57f8da2a8b7d008142b5026556cb"),
+				},
+				{
+					Author: "56525716+yupwei68@users.noreply.github.com",
+					Text:   `name = var.resource_group_name`,
+					Date:   timeParse(time.RFC1123Z, "Fri, 07 Feb 2020 18:42:06 +0800").UTC(),
+					Hash:   plumbing.NewHash("e6b0bff7323580793611d8f68db93deddd6f2a46"),
+				},
+			},
+		},
+		{
+			desc: "hash line with only three segments",
+			input: fmt.Sprintf(`ab749a40ab43ca6a876b8e6762b34193c483dda9 62 62
+author hezijie
+author-mail <lonegunmanb@hotmail.com>
+author-time 1704159642
+author-tz +0800
+committer hezijie
+committer-mail <lonegunmanb@hotmail.com>
+committer-time 1704159642
+committer-tz +0800
+summary refactor code, split monolith tf config into multiple files
+filename log_analytics.tf
+%sproduct   = "OMSGallery/ContainerInsights"
+`, "\t"),
+			expected: []*git.Line{
+				{
+					Author: "lonegunmanb@hotmail.com",
+					Text:   `product   = "OMSGallery/ContainerInsights"`,
+					Date:   timeParse(time.RFC1123Z, "Tue, 02 Jan 2024 09:40:42 +0800").UTC(),
+					Hash:   plumbing.NewHash("ab749a40ab43ca6a876b8e6762b34193c483dda9"),
+				},
+			},
+		},
+		{
+			desc: "single line with tab as prefix",
+			input: fmt.Sprintf(`cc26c4d06f8e57f8da2a8b7d008142b5026556cb 1 1 1
+author hezijie
+author-mail <lonegunmanb@hotmail.com>
+author-time 1709707964
+author-tz +0800
+committer hezijie
+committer-mail <lonegunmanb@hotmail.com>
+committer-time 1709707964
+committer-tz +0800
+summary multiple lines test
+previous fb8e4e2e0b8a874c18ad32a319a8d79c37519d2a main.tf
+filename main.tf
+%s%sline`, "\t", "\t"),
+			expected: []*git.Line{
+				{
+					Author: "lonegunmanb@hotmail.com",
+					Text:   fmt.Sprintf("%sline", "\t"),
+					//"Mon, 02 Jan 2006 15:04:05 -0700"
+					Date: timeParse(time.RFC1123Z, "Wed, 06 Mar 2024 14:52:44 +0800").UTC(),
+					Hash: plumbing.NewHash("cc26c4d06f8e57f8da2a8b7d008142b5026556cb"),
 				},
 			},
 		},

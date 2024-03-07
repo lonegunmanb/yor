@@ -73,10 +73,11 @@ func TestNewGitService(t *testing.T) {
 		}()
 		gitService, _ := NewGitService(terragoatPath)
 
-		blame, _ := gitService.GetBlameForFileLines("terraform/aws/s3.tf", structure.Lines{Start: 1, End: 13})
+		blame, _ := gitService.GetBlameForFileLines("terraform/aws/s3.tf", structure.Lines{Start: 1, End: 18})
 		commit := blame.GetLatestCommit()
-		assert.Equal(t, 13, len(blame.BlamesByLine))
-		assert.Equal(t, "d68d2897add9bc2203a5ed0632a5cdd8ff8cefb0", commit.Hash.String())
+		assert.Equal(t, 18, len(blame.BlamesByLine))
+		latestHash := commit.Hash.String()
+		assert.Equal(t, "d68d2897add9bc2203a5ed0632a5cdd8ff8cefb0", latestHash)
 	})
 
 	t.Run("Get blame for lines test", func(t *testing.T) {
